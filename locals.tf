@@ -1,8 +1,4 @@
-# TODO: insert locals here.
-locals {
-  resource_group_location            = try(data.azurerm_resource_group.parent[0].location, null)
-  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
-}
+
 
 # Private endpoint application security group associations
 # Remove if this resource does not support private endpoints
@@ -16,4 +12,14 @@ locals {
       }
     ]
   ]) : "${assoc.pe_key}-${assoc.asg_key}" => assoc }
+  role_definition_resource_substring = "/providers/Microsoft.Authorization/roleDefinitions"
+  shares_role_assignments = { for ra in flatten([
+    for sk, sv in var.role_assignments : [
+      for rk, rv in sv.role_assignments : {
+        share_key       = sk
+        ra_key          = rk
+        role_assignment = rv
+      }
+    ]
+  ]) : "${ra.share_key}-${ra.ra_key}" => ra }
 }

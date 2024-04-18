@@ -21,8 +21,11 @@ terraform {
 provider "azurerm" {
   features {}
 }
-
-
+# We use the role definition data source to get the id of the Contributor role
+data "azurerm_role_definition" "example" {
+  name = "Application Insights Component Contributor"
+}
+data "azurerm_client_config" "current" {}
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
@@ -62,6 +65,19 @@ module "test" {
   resource_group_name = azurerm_resource_group.this.name
 
   enable_telemetry = var.enable_telemetry # see variables.tf
+  role_assignments = {
+    role_assignment_1 = {
+      role_definition_id_or_name       = data.azurerm_role_definition.example.id
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+    role_assignment_2 = {
+      role_definition_id_or_name       = "Application Insights Snapshot Debugger"
+      principal_id                     = data.azurerm_client_config.current.object_id
+      skip_service_principal_aad_check = false
+    },
+
+  }
 }
 ```
 
@@ -90,6 +106,8 @@ The following resources are used by this module:
 
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
+- [azurerm_client_config.current](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/client_config) (data source)
+- [azurerm_role_definition.example](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/data-sources/role_definition) (data source)
 
 <!-- markdownlint-disable MD013 -->
 ## Required Inputs

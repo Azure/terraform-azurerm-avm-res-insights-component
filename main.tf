@@ -4,6 +4,20 @@ resource "azurerm_resource_group" "TODO" {
   name     = var.name # calling code must supply the name
 }
 
+resource "azurerm_application_insights" "this" {
+  application_type                      = var.application_type
+  location                              = var.location
+  name                                  = var.name
+  resource_group_name                   = var.resource_group_name
+  daily_data_cap_in_gb                  = var.daily_data_cap_in_gb
+  daily_data_cap_notifications_disabled = var.daily_data_cap_notifications_disabled
+  disable_ip_masking                    = var.disable_ip_masking
+  retention_in_days                     = var.retention_in_days
+  sampling_percentage                   = var.sampling_percentage
+  tags                                  = var.tags
+  workspace_id                          = var.workspace_id
+}
+
 # required AVM resources interfaces
 resource "azurerm_management_lock" "this" {
   count = var.lock.kind != "None" ? 1 : 0
