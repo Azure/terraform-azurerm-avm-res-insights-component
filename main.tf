@@ -1,13 +1,9 @@
-# TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
-resource "azurerm_resource_group" "TODO" {
-  location = var.location
-  name     = var.name # calling code must supply the name
-}
+
 
 resource "azurerm_application_insights" "this" {
   application_type                      = var.application_type
   location                              = var.location
-  name                                  = var.name
+  name                                  = "${local.managed_identity_abrv_prefix}-var.name"
   resource_group_name                   = var.resource_group_name
   daily_data_cap_in_gb                  = var.daily_data_cap_in_gb
   daily_data_cap_notifications_disabled = var.daily_data_cap_notifications_disabled
@@ -24,14 +20,14 @@ resource "azurerm_management_lock" "this" {
 
   lock_level = var.lock.kind
   name       = coalesce(var.lock.name, "lock-${var.name}")
-  scope      = azurerm_resource_group.TODO.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
+  scope      = azurerm_application_insights.this.id
 }
 
 resource "azurerm_role_assignment" "this" {
   for_each = var.role_assignments
 
   principal_id                           = each.value.principal_id
-  scope                                  = azurerm_resource_group.TODO.id # TODO: Replace this dummy resource azurerm_resource_group.TODO with your module resource
+  scope                                  = azurerm_application_insights.this.id
   condition                              = each.value.condition
   condition_version                      = each.value.condition_version
   delegated_managed_identity_resource_id = each.value.delegated_managed_identity_resource_id
