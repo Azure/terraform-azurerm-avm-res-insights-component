@@ -25,12 +25,6 @@ variable "workspace_id" {
   nullable    = false
 }
 
-variable "app_insights_prefix" {
-  type        = string
-  default     = "appi"
-  description = "The prefix to use for the Application Insights resource name."
-}
-
 variable "application_type" {
   type        = string
   default     = "web"

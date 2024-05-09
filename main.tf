@@ -3,7 +3,7 @@
 resource "azurerm_application_insights" "this" {
   application_type                      = var.application_type
   location                              = var.location
-  name                                  = "${var.app_insights_prefix}-${var.name}"
+  name                                  = var.name
   resource_group_name                   = var.resource_group_name
   daily_data_cap_in_gb                  = var.daily_data_cap_in_gb
   daily_data_cap_notifications_disabled = var.daily_data_cap_notifications_disabled
