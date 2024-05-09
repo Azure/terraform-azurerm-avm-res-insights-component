@@ -46,6 +46,14 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
+#Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
+resource "azurerm_log_analytics_workspace" "this" {
+  location            = azurerm_resource_group.this.location
+  name                = module.naming.log_analytics_workspace.name_unique
+  resource_group_name = azurerm_resource_group.this.name
+  sku                 = "PerGB2018"
+}
+
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
@@ -57,8 +65,8 @@ module "test" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.application_insights.name_unique
   resource_group_name = azurerm_resource_group.this.name
-
-  enable_telemetry = var.enable_telemetry # see variables.tf
+  workspace_id        = azurerm_log_analytics_workspace.this.workspace_id
+  enable_telemetry    = var.enable_telemetry # see variables.tf
   role_assignments = {
     role_assignment_1 = {
       role_definition_id_or_name       = data.azurerm_role_definition.example.id

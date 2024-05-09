@@ -14,10 +14,15 @@ variable "name" {
   }
 }
 
-# This is required for most resource modules
 variable "resource_group_name" {
   type        = string
   description = "The resource group where the resources will be deployed."
+}
+
+variable "workspace_id" {
+  type        = string
+  description = "(Required) The ID of the Log Analytics workspace to send data to. AzureRm supports classic; however, Azure has deprecated it, thus it's required"
+  nullable    = false
 }
 
 variable "application_type" {
@@ -31,6 +36,7 @@ variable "application_type" {
   }
 }
 
+# Optional Variables
 variable "daily_data_cap_in_gb" {
   type        = number
   default     = 0
@@ -190,10 +196,4 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
-}
-
-variable "workspace_id" {
-  type        = string
-  default     = null
-  description = "(Optional) The ID of the Log Analytics workspace to send data to. If not set, data will be sent to the default Log Analytics workspace for the subscription."
 }

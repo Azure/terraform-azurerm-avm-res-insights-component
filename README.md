@@ -62,6 +62,12 @@ Description: The resource group where the resources will be deployed.
 
 Type: `string`
 
+### <a name="input_workspace_id"></a> [workspace\_id](#input\_workspace\_id)
+
+Description: (Required) The ID of the Log Analytics workspace to send data to. AzureRm supports classic; however, Azure has deprecated it, thus it's required
+
+Type: `string`
+
 ## Optional Inputs
 
 The following input variables are optional (have default values):
@@ -250,14 +256,6 @@ Default: `100`
 Description: (Optional) Tags of the resource.
 
 Type: `map(string)`
-
-Default: `null`
-
-### <a name="input_workspace_id"></a> [workspace\_id](#input\_workspace\_id)
-
-Description: (Optional) The ID of the Log Analytics workspace to send data to. If not set, data will be sent to the default Log Analytics workspace for the subscription.
-
-Type: `string`
 
 Default: `null`
 
