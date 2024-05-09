@@ -72,6 +72,14 @@ Type: `string`
 
 The following input variables are optional (have default values):
 
+### <a name="input_app_insights_prefix"></a> [app\_insights\_prefix](#input\_app\_insights\_prefix)
+
+Description: The prefix to use for the Application Insights resource name.
+
+Type: `string`
+
+Default: `"appi"`
+
 ### <a name="input_application_type"></a> [application\_type](#input\_application\_type)
 
 Description: (Required) The type of the application. Possible values are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'other', 'store'.
