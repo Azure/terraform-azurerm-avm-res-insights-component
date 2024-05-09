@@ -3,7 +3,6 @@
 # Private endpoint application security group associations
 # Remove if this resource does not support private endpoints
 locals {
-  managed_identity_abrv_prefix = "appi"
   private_endpoint_application_security_group_associations = { for assoc in flatten([
     for pe_k, pe_v in var.private_endpoints : [
       for asg_k, asg_v in pe_v.application_security_group_associations : {
