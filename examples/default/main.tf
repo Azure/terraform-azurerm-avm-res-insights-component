@@ -62,6 +62,6 @@ module "test" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.application_insights.name_unique
   resource_group_name = azurerm_resource_group.this.name
-  workspace_id        = azurerm_log_analytics_workspace.this.workspace_id
+  workspace_id        = azurerm_log_analytics_workspace.this.id
   enable_telemetry    = var.enable_telemetry # see variables.tf
 }
