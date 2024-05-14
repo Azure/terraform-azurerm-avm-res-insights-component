@@ -83,7 +83,7 @@ Description: (Optional) The daily data cap in GB. 0 means unlimited.
 
 Type: `number`
 
-Default: `0`
+Default: `100`
 
 ### <a name="input_daily_data_cap_notifications_disabled"></a> [daily\_data\_cap\_notifications\_disabled](#input\_daily\_data\_cap\_notifications\_disabled)
 
