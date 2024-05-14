@@ -49,6 +49,7 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
+
 #Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
 resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
@@ -57,12 +58,13 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                 = "PerGB2018"
 }
 
+
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source = "../../"
+  source = "../.."
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location            = azurerm_resource_group.this.location
@@ -141,7 +143,7 @@ Version: ~> 0.3
 
 ### <a name="module_test"></a> [test](#module\_test)
 
-Source: ../../
+Source: ../..
 
 Version:
 
