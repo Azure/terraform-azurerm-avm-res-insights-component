@@ -39,7 +39,7 @@ variable "application_type" {
 # Optional Variables
 variable "daily_data_cap_in_gb" {
   type        = number
-  default     = 0
+  default     = 100
   description = "(Optional) The daily data cap in GB. 0 means unlimited."
 }
 
