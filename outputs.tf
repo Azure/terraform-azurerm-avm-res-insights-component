@@ -26,3 +26,8 @@ output "resource" {
   description = "This is the full output for the resource."
   value       = azurerm_application_insights.this
 }
+
+output "resource_id" {
+  description = "The ID of the Application Insights"
+  value       = azurerm_application_insights.this.id
+}

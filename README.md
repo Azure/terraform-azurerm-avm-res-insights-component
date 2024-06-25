@@ -195,6 +195,10 @@ Description: Name of the Application Insights
 
 Description: This is the full output for the resource.
 
+### <a name="output_resource_id"></a> [resource\_id](#output\_resource\_id)
+
+Description: The ID of the Application Insights
+
 ## Modules
 
 No modules.
