@@ -175,6 +175,18 @@ Default: `null`
 
 The following outputs are exported:
 
+### <a name="output_app_id"></a> [app\_id](#output\_app\_id)
+
+Description: App ID of the Application Insights
+
+### <a name="output_connection_string"></a> [connection\_string](#output\_connection\_string)
+
+Description: Connection String of the Application Insights
+
+### <a name="output_instrumentation_key"></a> [instrumentation\_key](#output\_instrumentation\_key)
+
+Description: Instrumentation Key of the Application Insights
+
 ### <a name="output_name"></a> [name](#output\_name)
 
 Description: Name of the Application Insights
