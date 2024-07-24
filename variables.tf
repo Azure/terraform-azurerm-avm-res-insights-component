@@ -9,7 +9,7 @@ variable "name" {
   description = "The name of the this resource."
 
   validation {
-    condition     = can(regex("^[a-z0-9-]{5,50}$", var.name))
+    condition     = can(regex("^[A-Za-z0-9._()-]{1,254}[A-Za-z0-9_()-]$", var.name))
     error_message = "The name must be between 5 and 50 characters long and can only contain lowercase letters and numbers."
   }
 }
