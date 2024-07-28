@@ -6,6 +6,7 @@ data "modtm_module_source" "telemetry" {
   count       = var.enable_telemetry ? 1 : 0
   module_path = path.module
 }
+
 resource "random_uuid" "telemetry" {
   count = var.enable_telemetry ? 1 : 0
 }
