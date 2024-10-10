@@ -65,6 +65,24 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
+variable "internet_ingestion_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Enables internet ingestion. Defaults to true."
+}
+
+variable "internet_query_enabled" {
+  type        = bool
+  default     = true
+  description = "(Optional) Enables internet query. Defaults to true."
+}
+
+variable "local_authentication_disabled" {
+  type        = bool
+  default     = false
+  description = "(Optional) Disables local authentication. Defaults to false."
+}
+
 variable "lock" {
   type = object({
     kind = string
