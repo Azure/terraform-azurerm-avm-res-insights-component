@@ -107,6 +107,30 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_internet_ingestion_enabled"></a> [internet\_ingestion\_enabled](#input\_internet\_ingestion\_enabled)
+
+Description: (Optional) Enables internet ingestion. Defaults to true.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_internet_query_enabled"></a> [internet\_query\_enabled](#input\_internet\_query\_enabled)
+
+Description: (Optional) Enables internet query. Defaults to true.
+
+Type: `bool`
+
+Default: `true`
+
+### <a name="input_local_authentication_disabled"></a> [local\_authentication\_disabled](#input\_local\_authentication\_disabled)
+
+Description: (Optional) Disables local authentication. Defaults to false.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_lock"></a> [lock](#input\_lock)
 
 Description:   Controls the Resource Lock configuration for this resource. The following properties can be specified:
