@@ -5,7 +5,7 @@ This deploys the module with local authentication disabled, public internet inge
 
 ```hcl
 terraform {
-  required_version = "~> 1.3"
+  required_version = ">= 1.9, < 2.0"
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
@@ -95,7 +95,7 @@ resource "azurerm_monitor_private_link_scoped_service" "this" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.3)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (~> 3.74)
 
