@@ -65,6 +65,12 @@ If it is set to false, then no telemetry will be collected.
 DESCRIPTION
 }
 
+variable "force_customer_storage_for_profiler" {
+  type        = bool
+  default     = false
+  description = "(Optional) Forces customer storage for profiler. Defaults to false."
+}
+
 variable "internet_ingestion_enabled" {
   type        = bool
   default     = true
@@ -75,6 +81,19 @@ variable "internet_query_enabled" {
   type        = bool
   default     = true
   description = "(Optional) Enables internet query. Defaults to true."
+}
+
+variable "linked_storage_account" {
+  type = map(object({
+    resource_id = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+  Linked storage account configuration for the Application Insights profiler.
+    - `resource_id`: The resource ID of the storage account.
+
+  Requires granting the Storage Blob Data Contributor role to the Microsoft Entra application Diagnostic Services Trusted Storage Access.
+DESCRIPTION
 }
 
 variable "local_authentication_disabled" {
@@ -116,6 +135,19 @@ variable "managed_identities" {
   - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
   DESCRIPTION
   nullable    = false
+}
+
+variable "monitor_private_link_scope" {
+  type = map(object({
+    resource_id = optional(string, null)
+    name        = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+  Monitor private link scope configuration.
+    - `resource_id`: The resource ID of the monitor private link scope.
+    - `name`: The name of the scoped resource. Defaults to the Application Insights resource name.
+DESCRIPTION
 }
 
 variable "retention_in_days" {

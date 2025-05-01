@@ -8,6 +8,7 @@ resource "azurerm_application_insights" "this" {
   daily_data_cap_in_gb                  = var.daily_data_cap_in_gb
   daily_data_cap_notifications_disabled = var.daily_data_cap_notifications_disabled
   disable_ip_masking                    = var.disable_ip_masking
+  force_customer_storage_for_profiler   = var.force_customer_storage_for_profiler
   internet_ingestion_enabled            = var.internet_ingestion_enabled
   internet_query_enabled                = var.internet_query_enabled
   local_authentication_disabled         = var.local_authentication_disabled
@@ -26,3 +27,30 @@ resource "azurerm_management_lock" "this" {
   scope      = azurerm_application_insights.this.id
 }
 
+resource "azapi_resource" "monitor_private_link_scope" {
+  for_each = var.monitor_private_link_scope
+
+  type = "Microsoft.Insights/privateLinkScopes/scopedResources@2021-07-01-preview"
+  body = {
+    properties = {
+      linkedResourceId = azurerm_application_insights.this.id
+    }
+  }
+  ignore_casing = true
+  name          = each.value.name != null ? each.value.name : azurerm_application_insights.this.name
+  parent_id     = each.value.resource_id
+}
+
+resource "azapi_resource" "linked_storage_account" {
+  for_each = var.linked_storage_account
+
+  type = "microsoft.insights/components/linkedStorageAccounts@2020-03-01-preview"
+  body = {
+    properties = {
+      linkedStorageAccount = each.value.resource_id
+    }
+  }
+  ignore_casing = true
+  name          = "serviceprofiler"
+  parent_id     = azurerm_application_insights.this.id
+}
