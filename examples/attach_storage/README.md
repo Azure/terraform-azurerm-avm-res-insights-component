@@ -1,5 +1,5 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example w/ attached storage
+# Attached storage
 
 Requires granting the Storage Blob Data Contributor role to the Microsoft Entra application Diagnostic Services Trusted Storage Access.
 
@@ -15,7 +15,7 @@ Requires granting the Storage Blob Data Contributor role to the Microsoft Entra 
   }
   ```
 
-This deploys the module with attached storage for the service profiler.
+This deploys the module with force customer storage for profiler enabled, attached storage for the service profiler.
 
 ```hcl
 terraform {
