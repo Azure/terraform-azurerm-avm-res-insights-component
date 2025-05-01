@@ -7,10 +7,6 @@ This deploys the module in its simplest form.
 terraform {
   required_version = "~> 1.3"
   required_providers {
-    azuread = {
-      source  = "hashicorp/azuread"
-      version = "~> 3.3"
-    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">=3.71, < 5.0.0"
@@ -21,8 +17,6 @@ terraform {
     }
   }
 }
-
-provider "azuread" {}
 
 provider "azurerm" {
   features {
@@ -76,20 +70,6 @@ resource "azurerm_storage_account" "this" {
   min_tls_version          = "TLS1_2"
 }
 
-/*
-# This is the service principal used to access the storage account.
-data "azuread_service_principal" "this" {
-  display_name = "Diagnostic Services Trusted Storage Access"
-}
-
-# This is required for the profiler to access the storage account.
-resource "azurerm_role_assignment" "this" {
-  principal_id         = data.azuread_service_principal.this.object_id
-  scope                = azurerm_storage_account.this.id
-  role_definition_name = "Storage Blob Data Contributor"
-}
-*/
-
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
@@ -119,8 +99,6 @@ module "test" {
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.3)
-
-- <a name="requirement_azuread"></a> [azuread](#requirement\_azuread) (~> 3.3)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>=3.71, < 5.0.0)
 

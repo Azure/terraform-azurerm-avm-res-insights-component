@@ -142,6 +142,18 @@ Description:   Linked storage account configuration for the Application Insights
 
   Requires granting the Storage Blob Data Contributor role to the Microsoft Entra application Diagnostic Services Trusted Storage Access.
 
+  ```hcl
+  data "azuread_service_principal" "this" {
+    display_name = "Diagnostic Services Trusted Storage Access"
+  }
+
+  resource "azurerm_role_assignment" "this" {
+    principal_id         = data.azuread_service_principal.this.object_id
+    scope                = azurerm_storage_account.this.id
+    role_definition_name = "Storage Blob Data Contributor"
+  }
+```
+
 Type:
 
 ```hcl
@@ -198,7 +210,7 @@ Default: `{}`
 
 ### <a name="input_monitor_private_link_scope"></a> [monitor\_private\_link\_scope](#input\_monitor\_private\_link\_scope)
 
-Description:   Monitor private link scope configuration.
+Description:   Monitor private link scope to connect the Application Insights resource to.
     - `resource_id`: The resource ID of the monitor private link scope.
     - `name`: The name of the scoped resource. Defaults to the Application Insights resource name.
 
