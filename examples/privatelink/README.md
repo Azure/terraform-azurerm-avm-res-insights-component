@@ -66,6 +66,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 # with a data source.
 module "test" {
   source = "../.."
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location                      = azurerm_resource_group.this.location
@@ -73,10 +74,9 @@ module "test" {
   resource_group_name           = azurerm_resource_group.this.name
   workspace_id                  = azurerm_log_analytics_workspace.this.id
   enable_telemetry              = var.enable_telemetry # see variables.tf
-  local_authentication_disabled = true
   internet_ingestion_enabled    = false
   internet_query_enabled        = false
-
+  local_authentication_disabled = true
   monitor_private_link_scope = {
     ampls_01 = {
       resource_id = azurerm_monitor_private_link_scope.this.id

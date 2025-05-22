@@ -90,6 +90,7 @@ resource "azurerm_storage_account" "this" {
 # with a data source.
 module "test" {
   source = "../../"
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location                            = azurerm_resource_group.this.location
@@ -98,7 +99,6 @@ module "test" {
   workspace_id                        = azurerm_log_analytics_workspace.this.id
   enable_telemetry                    = var.enable_telemetry # see variables.tf
   force_customer_storage_for_profiler = true
-
   linked_storage_account = {
     profiler = {
       resource_id = azurerm_storage_account.this.id
