@@ -30,7 +30,7 @@ resource "azurerm_management_lock" "this" {
 resource "azapi_resource" "monitor_private_link_scope" {
   for_each = var.monitor_private_link_scope
 
-  type = "Microsoft.Insights/privateLinkScopes/scopedResources@2021-07-01-preview"
+  type = "Microsoft.Insights/privateLinkScopes/scopedResources@2023-06-01-preview"
   body = {
     properties = {
       linkedResourceId = azurerm_application_insights.this.id
