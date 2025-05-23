@@ -33,7 +33,9 @@ resource "azapi_resource" "monitor_private_link_scope" {
   type = "Microsoft.Insights/privateLinkScopes/scopedResources@2023-06-01-preview"
   body = {
     properties = {
-      linkedResourceId = azurerm_application_insights.this.id
+      kind                 = each.value.kind
+      linkedResourceId     = azurerm_application_insights.this.id
+      subscriptionLocation = each.value.subscription_location
     }
   }
   ignore_casing = true

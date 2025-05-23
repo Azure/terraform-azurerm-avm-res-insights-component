@@ -201,13 +201,17 @@ Description:   Monitor private link scope to connect the Application Insights re
 
   - `resource_id` - The resource ID of the monitor private link scope.
   - `name` - The name of the scoped resource. Defaults to the Application Insights resource name.
+  - `kind` - The kind of the scoped resource. Defaults to `Resource`. Possible values are `Resource` or `Metrics`.
+  - `subscription_location` - The location of the subscription. This is required for kind `Metrics`.
 
 Type:
 
 ```hcl
 map(object({
-    resource_id = optional(string, null)
-    name        = optional(string, null)
+    resource_id           = optional(string, null)
+    name                  = optional(string, null)
+    kind                  = optional(string, "Resource")
+    subscription_location = optional(string, null)
   }))
 ```
 

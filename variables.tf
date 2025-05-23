@@ -138,8 +138,10 @@ variable "managed_identities" {
 
 variable "monitor_private_link_scope" {
   type = map(object({
-    resource_id = optional(string, null)
-    name        = optional(string, null)
+    resource_id           = optional(string, null)
+    name                  = optional(string, null)
+    kind                  = optional(string, "Resource")
+    subscription_location = optional(string, null)
   }))
   default     = {}
   description = <<DESCRIPTION
@@ -147,7 +149,19 @@ variable "monitor_private_link_scope" {
 
   - `resource_id` - The resource ID of the monitor private link scope.
   - `name` - The name of the scoped resource. Defaults to the Application Insights resource name.
-DESCRIPTION
+  - `kind` - The kind of the scoped resource. Defaults to `Resource`. Possible values are `Resource` or `Metrics`.
+  - `subscription_location` - The location of the subscription. This is required for kind `Metrics`.
+  DESCRIPTION
+
+  validation {
+    condition = alltrue([
+      for scope in [for scope in var.monitor_private_link_scope : scope] : (
+        (scope.kind == "Resource" && scope.subscription_location == null) ||
+        (scope.kind == "Metrics" && scope.subscription_location != null)
+      )
+    ])
+    error_message = "For kind `Metrics`, subscription_location is required. For kind `Resource`, subscription_location must be null."
+  }
 }
 
 variable "retention_in_days" {
