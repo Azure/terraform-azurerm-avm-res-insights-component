@@ -30,7 +30,9 @@ resource "azurerm_management_lock" "this" {
 resource "azapi_resource" "monitor_private_link_scope" {
   for_each = var.monitor_private_link_scope
 
-  type = "Microsoft.Insights/privateLinkScopes/scopedResources@2023-06-01-preview"
+  name      = each.value.name != null ? each.value.name : azurerm_application_insights.this.name
+  parent_id = each.value.resource_id
+  type      = "Microsoft.Insights/privateLinkScopes/scopedResources@2023-06-01-preview"
   body = {
     properties = {
       kind                 = each.value.kind
@@ -39,20 +41,18 @@ resource "azapi_resource" "monitor_private_link_scope" {
     }
   }
   ignore_casing = true
-  name          = each.value.name != null ? each.value.name : azurerm_application_insights.this.name
-  parent_id     = each.value.resource_id
 }
 
 resource "azapi_resource" "linked_storage_account" {
   for_each = var.linked_storage_account
 
-  type = "microsoft.insights/components/linkedStorageAccounts@2020-03-01-preview"
+  name      = "serviceprofiler"
+  parent_id = azurerm_application_insights.this.id
+  type      = "microsoft.insights/components/linkedStorageAccounts@2020-03-01-preview"
   body = {
     properties = {
       linkedStorageAccount = each.value.resource_id
     }
   }
   ignore_casing = true
-  name          = "serviceprofiler"
-  parent_id     = azurerm_application_insights.this.id
 }
