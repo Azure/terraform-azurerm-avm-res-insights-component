@@ -1,7 +1,21 @@
 <!-- BEGIN_TF_DOCS -->
-# Default example
+# Attached storage
 
-This deploys the module in its simplest form.
+Requires granting the Storage Blob Data Contributor role to the Microsoft Entra application Diagnostic Services Trusted Storage Access.
+
+  ```hcl
+  data "azuread_service_principal" "this" {
+    display_name = "Diagnostic Services Trusted Storage Access"
+  }
+
+  resource "azurerm_role_assignment" "this" {
+    principal_id         = data.azuread_service_principal.this.object_id
+    scope                = azurerm_storage_account.this.id
+    role_definition_name = "Storage Blob Data Contributor"
+  }
+  ```
+
+This deploys the module with force customer storage for profiler enabled, attached storage for the service profiler.
 
 ```hcl
 terraform {
@@ -10,7 +24,6 @@ terraform {
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">=3.71, < 5.0.0"
-
     }
     random = {
       source  = "hashicorp/random"
@@ -20,9 +33,12 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
-
 
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
@@ -50,7 +66,6 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
-
 #Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
 resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
@@ -59,21 +74,36 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                 = "PerGB2018"
 }
 
+# This is the storage account for the profiler.
+resource "azurerm_storage_account" "this" {
+  account_replication_type = "ZRS"
+  account_tier             = "Standard"
+  location                 = azurerm_resource_group.this.location
+  name                     = module.naming.storage_account.name_unique
+  resource_group_name      = azurerm_resource_group.this.name
+  min_tls_version          = "TLS1_2"
+}
 
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
-  source = "../.."
+  source = "../../"
 
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.application_insights.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  workspace_id        = azurerm_log_analytics_workspace.this.id
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  location                            = azurerm_resource_group.this.location
+  name                                = module.naming.application_insights.name_unique
+  resource_group_name                 = azurerm_resource_group.this.name
+  workspace_id                        = azurerm_log_analytics_workspace.this.id
+  enable_telemetry                    = var.enable_telemetry # see variables.tf
+  force_customer_storage_for_profiler = true
+  linked_storage_account = {
+    profiler = {
+      resource_id = azurerm_storage_account.this.id
+    }
+  }
 }
 ```
 
@@ -94,6 +124,7 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azurerm_storage_account.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/storage_account) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -137,7 +168,7 @@ Version: ~> 0.3
 
 ### <a name="module_test"></a> [test](#module\_test)
 
-Source: ../..
+Source: ../../
 
 Version:
 

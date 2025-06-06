@@ -15,6 +15,8 @@ The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.4, < 3.0.0)
+
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>=3.71, < 5.0.0)
 
 - <a name="requirement_modtm"></a> [modtm](#requirement\_modtm) (~> 0.3)
@@ -25,6 +27,8 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
+- [azapi_resource.linked_storage_account](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.monitor_private_link_scope](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_application_insights.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
@@ -107,6 +111,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_force_customer_storage_for_profiler"></a> [force\_customer\_storage\_for\_profiler](#input\_force\_customer\_storage\_for\_profiler)
+
+Description: (Optional) Forces customer storage for profiler. Defaults to false.
+
+Type: `bool`
+
+Default: `false`
+
 ### <a name="input_internet_ingestion_enabled"></a> [internet\_ingestion\_enabled](#input\_internet\_ingestion\_enabled)
 
 Description: (Optional) Enables internet ingestion. Defaults to true.
@@ -122,6 +134,22 @@ Description: (Optional) Enables internet query. Defaults to true.
 Type: `bool`
 
 Default: `true`
+
+### <a name="input_linked_storage_account"></a> [linked\_storage\_account](#input\_linked\_storage\_account)
+
+Description:   Linked storage account configuration for the Application Insights profiler.
+
+  - `resource_id` - The resource ID of the storage account.
+
+Type:
+
+```hcl
+map(object({
+    resource_id = optional(string, null)
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_local_authentication_disabled"></a> [local\_authentication\_disabled](#input\_local\_authentication\_disabled)
 
@@ -163,6 +191,28 @@ object({
     system_assigned            = optional(bool, false)
     user_assigned_resource_ids = optional(set(string), [])
   })
+```
+
+Default: `{}`
+
+### <a name="input_monitor_private_link_scope"></a> [monitor\_private\_link\_scope](#input\_monitor\_private\_link\_scope)
+
+Description:   Monitor private link scope to connect the Application Insights resource to.
+
+  - `resource_id` - The resource ID of the monitor private link scope.
+  - `name` - The name of the scoped resource. Defaults to the Application Insights resource name.
+  - `kind` - The kind of the scoped resource. Defaults to `Resource`. Possible values are `Resource` or `Metrics`.
+  - `subscription_location` - The location of the subscription. This is required for kind `Metrics`.
+
+Type:
+
+```hcl
+map(object({
+    resource_id           = optional(string, null)
+    name                  = optional(string, null)
+    kind                  = optional(string, "Resource")
+    subscription_location = optional(string, null)
+  }))
 ```
 
 Default: `{}`
