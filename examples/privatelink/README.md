@@ -19,9 +19,12 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
-
 
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
@@ -49,7 +52,6 @@ resource "azurerm_resource_group" "this" {
   name     = module.naming.resource_group.name_unique
 }
 
-
 #Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
 resource "azurerm_log_analytics_workspace" "this" {
   location            = azurerm_resource_group.this.location
@@ -58,13 +60,13 @@ resource "azurerm_log_analytics_workspace" "this" {
   sku                 = "PerGB2018"
 }
 
-
 # This is the module call
 # Do not specify location here due to the randomization above.
 # Leaving location as `null` will cause the module to use the resource group location
 # with a data source.
 module "test" {
   source = "../.."
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location                      = azurerm_resource_group.this.location
@@ -72,21 +74,19 @@ module "test" {
   resource_group_name           = azurerm_resource_group.this.name
   workspace_id                  = azurerm_log_analytics_workspace.this.id
   enable_telemetry              = var.enable_telemetry # see variables.tf
-  local_authentication_disabled = true
   internet_ingestion_enabled    = false
   internet_query_enabled        = false
+  local_authentication_disabled = true
+  monitor_private_link_scope = {
+    ampls_01 = {
+      resource_id = azurerm_monitor_private_link_scope.this.id
+    }
+  }
 }
 
 resource "azurerm_monitor_private_link_scope" "this" {
   name                = "privatelink.scope"
   resource_group_name = azurerm_resource_group.this.name
-}
-
-resource "azurerm_monitor_private_link_scoped_service" "this" {
-  linked_resource_id  = module.test.resource_id
-  name                = "privatelinkscopedservice.appinsights"
-  resource_group_name = azurerm_resource_group.this.name
-  scope_name          = azurerm_monitor_private_link_scope.this.name
 }
 ```
 
@@ -107,7 +107,6 @@ The following resources are used by this module:
 
 - [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
 - [azurerm_monitor_private_link_scope.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_private_link_scope) (resource)
-- [azurerm_monitor_private_link_scoped_service.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_private_link_scoped_service) (resource)
 - [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 

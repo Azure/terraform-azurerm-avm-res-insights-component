@@ -58,6 +58,7 @@ resource "azurerm_log_analytics_workspace" "this" {
 # with a data source.
 module "test" {
   source = "../../"
+
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
   location            = azurerm_resource_group.this.location
