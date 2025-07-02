@@ -6,6 +6,7 @@ This deploys the module with local authentication disabled, public internet inge
 ```hcl
 terraform {
   required_version = "~> 1.3"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
