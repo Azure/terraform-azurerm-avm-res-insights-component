@@ -20,6 +20,7 @@ This deploys the module with force customer storage for profiler enabled, attach
 ```hcl
 terraform {
   required_version = "~> 1.3"
+
   required_providers {
     azurerm = {
       source  = "hashicorp/azurerm"
