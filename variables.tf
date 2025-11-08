@@ -171,19 +171,6 @@ variable "retention_in_days" {
   description = "(Optional) The retention period in days. 0 means unlimited."
 }
 
-variable "sampling_percentage" {
-  type        = number
-  default     = 100
-  description = "(Optional) The sampling percentage. 100 means all."
-}
-
-# tflint-ignore: terraform_unused_declarations
-variable "tags" {
-  type        = map(string)
-  default     = null
-  description = "(Optional) Tags of the resource."
-}
-
 variable "role_assignments" {
   type = map(object({
     role_definition_id_or_name             = string
@@ -211,4 +198,17 @@ A map of role assignments to create on this resource. The map key is deliberatel
 > Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
 DESCRIPTION
   nullable    = false
+}
+
+variable "sampling_percentage" {
+  type        = number
+  default     = 100
+  description = "(Optional) The sampling percentage. 100 means all."
+}
+
+# tflint-ignore: terraform_unused_declarations
+variable "tags" {
+  type        = map(string)
+  default     = null
+  description = "(Optional) Tags of the resource."
 }
