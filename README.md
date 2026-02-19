@@ -32,6 +32,7 @@ The following resources are used by this module:
 - [azapi_resource.monitor_private_link_scope](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [azurerm_application_insights.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/application_insights) (resource)
 - [azurerm_management_lock.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/management_lock) (resource)
+- [azurerm_role_assignment.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/role_assignment) (resource)
 - [modtm_telemetry.telemetry](https://registry.terraform.io/providers/azure/modtm/latest/docs/resources/telemetry) (resource)
 - [random_uuid.telemetry](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/uuid) (resource)
 - [azapi_client_config.telemetry](https://registry.terraform.io/providers/Azure/azapi/latest/docs/data-sources/client_config) (data source)
@@ -225,6 +226,38 @@ Description: (Optional) The retention period in days. 0 means unlimited.
 Type: `number`
 
 Default: `90`
+
+### <a name="input_role_assignments"></a> [role\_assignments](#input\_role\_assignments)
+
+Description: A map of role assignments to create on this resource. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+- `role_definition_id_or_name` - The ID or name of the role definition to assign to the principal.
+- `principal_id` - The ID of the principal to assign the role to.
+- `description` - The description of the role assignment.
+- `skip_service_principal_aad_check` - If set to true, skips the Azure Active Directory check for the service principal in the tenant. Defaults to false.
+- `condition` - The condition which will be used to scope the role assignment.
+- `condition_version` - The version of the condition syntax. Valid values are '2.0'.
+- `delegated_managed_identity_resource_id` - The delegated Azure Resource Id which contains a Managed Identity. Changing this forces a new resource to be created.
+- `principal_type` - The type of the principal\_id. Possible values are `User`, `Group` and `ServicePrincipal`. Changing this forces a new resource to be created. It is necessary to explicitly set this attribute when creating role assignments if the principal creating the assignment is constrained by ABAC rules that filters on the PrincipalType attribute.
+
+> Note: only set `skip_service_principal_aad_check` to true if you are assigning a role to a service principal.
+
+Type:
+
+```hcl
+map(object({
+    role_definition_id_or_name             = string
+    principal_id                           = string
+    description                            = optional(string, null)
+    skip_service_principal_aad_check       = optional(bool, false)
+    condition                              = optional(string, null)
+    condition_version                      = optional(string, null)
+    delegated_managed_identity_resource_id = optional(string, null)
+    principal_type                         = optional(string, null)
+  }))
+```
+
+Default: `{}`
 
 ### <a name="input_sampling_percentage"></a> [sampling\_percentage](#input\_sampling\_percentage)
 
