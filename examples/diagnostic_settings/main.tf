@@ -15,7 +15,11 @@ terraform {
 }
 
 provider "azurerm" {
-  features {}
+  features {
+    resource_group {
+      prevent_deletion_if_contains_resources = false
+    }
+  }
 }
 
 
@@ -46,12 +50,21 @@ resource "azurerm_resource_group" "this" {
 }
 
 
-#Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
-resource "azurerm_log_analytics_workspace" "this" {
+# Log Analytics Workspace connected to Application Insights.
+resource "azurerm_log_analytics_workspace" "insights" {
   location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
+  name                = "${substr(module.naming.log_analytics_workspace.name_unique, 0, 60)}-ai"
   resource_group_name = azurerm_resource_group.this.name
   sku                 = "PerGB2018"
+}
+
+# Separate Log Analytics Workspace for diagnostic settings.
+resource "azurerm_log_analytics_workspace" "diagnostic" {
+  location                     = azurerm_resource_group.this.location
+  name                         = "${substr(module.naming.log_analytics_workspace.name_unique, 0, 58)}-diag"
+  resource_group_name          = azurerm_resource_group.this.name
+  local_authentication_enabled = false
+  sku                          = "PerGB2018"
 }
 
 
@@ -67,6 +80,17 @@ module "test" {
   location            = azurerm_resource_group.this.location
   name                = module.naming.application_insights.name_unique
   resource_group_name = azurerm_resource_group.this.name
-  workspace_id        = azurerm_log_analytics_workspace.this.id
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  workspace_id        = azurerm_log_analytics_workspace.insights.id
+  diagnostic_settings = {
+    default = {
+      name                  = "diag-${module.naming.application_insights.name_unique}"
+      workspace_resource_id = azurerm_log_analytics_workspace.diagnostic.id
+      log_categories = [
+        "AppPerformanceCounters",
+        "AppRequests",
+        "AppTraces"
+      ]
+    }
+  }
+  enable_telemetry = var.enable_telemetry # see variables.tf
 }
