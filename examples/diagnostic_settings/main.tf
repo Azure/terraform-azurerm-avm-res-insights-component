@@ -60,10 +60,11 @@ resource "azurerm_log_analytics_workspace" "insights" {
 
 # Separate Log Analytics Workspace for diagnostic settings.
 resource "azurerm_log_analytics_workspace" "diagnostic" {
-  location            = azurerm_resource_group.this.location
-  name                = "${substr(module.naming.log_analytics_workspace.name_unique, 0, 58)}-diag"
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "PerGB2018"
+  location                     = azurerm_resource_group.this.location
+  name                         = "${substr(module.naming.log_analytics_workspace.name_unique, 0, 58)}-diag"
+  resource_group_name          = azurerm_resource_group.this.name
+  local_authentication_enabled = false
+  sku                          = "PerGB2018"
 }
 
 
