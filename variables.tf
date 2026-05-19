@@ -49,6 +49,64 @@ variable "daily_data_cap_notifications_disabled" {
   description = "(Optional) Disables the daily data cap notifications."
 }
 
+variable "diagnostic_settings" {
+  type = map(object({
+    name = optional(string, null)
+    logs = optional(set(object({
+      category       = optional(string, null)
+      category_group = optional(string, null)
+      enabled        = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    metrics = optional(set(object({
+      category = optional(string, null)
+      enabled  = optional(bool, true)
+      retention_policy = optional(object({
+        days    = optional(number, 0)
+        enabled = optional(bool, false)
+      }), {})
+    })), [])
+    log_analytics_destination_type           = optional(string, "Dedicated")
+    workspace_resource_id                    = optional(string, null)
+    storage_account_resource_id              = optional(string, null)
+    event_hub_authorization_rule_resource_id = optional(string, null)
+    event_hub_name                           = optional(string, null)
+    marketplace_partner_resource_id          = optional(string, null)
+  }))
+  default     = {}
+  description = <<DESCRIPTION
+  A map of diagnostic settings to create on the Application Insights component. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
+
+  - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
+  - `logs` - (Optional) A set of log categories or category groups to send to the destination.
+  - `metrics` - (Optional) A set of metric categories to send to the destination.
+  - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
+  - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
+  - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
+  - `event_hub_authorization_rule_resource_id` - (Optional) The resource ID of the event hub authorization rule to send logs and metrics to.
+  - `event_hub_name` - (Optional) The name of the event hub. If none is specified, the default event hub will be selected.
+  - `marketplace_partner_resource_id` - (Optional) The full ARM resource ID of the Marketplace resource to which you would like to send Diagnostic Logs.
+  DESCRIPTION
+  nullable    = false
+
+  validation {
+    condition     = alltrue([for _, v in var.diagnostic_settings : contains(["Dedicated", "AzureDiagnostics"], v.log_analytics_destination_type)])
+    error_message = "Log analytics destination type must be one of: 'Dedicated', 'AzureDiagnostics'."
+  }
+  validation {
+    condition = alltrue(
+      [
+        for _, v in var.diagnostic_settings :
+        v.workspace_resource_id != null || v.storage_account_resource_id != null || v.event_hub_authorization_rule_resource_id != null || v.marketplace_partner_resource_id != null
+      ]
+    )
+    error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
+}
+
 variable "disable_ip_masking" {
   type        = bool
   default     = false
@@ -121,22 +179,6 @@ variable "lock" {
   }
 }
 
-# tflint-ignore: terraform_unused_declarations
-variable "managed_identities" {
-  type = object({
-    system_assigned            = optional(bool, false)
-    user_assigned_resource_ids = optional(set(string), [])
-  })
-  default     = {}
-  description = <<DESCRIPTION
-  Controls the Managed Identity configuration on this resource. The following properties can be specified:
-
-  - `system_assigned` - (Optional) Specifies if the System Assigned Managed Identity should be enabled.
-  - `user_assigned_resource_ids` - (Optional) Specifies a list of User Assigned Managed Identity resource IDs to be assigned to this resource.
-  DESCRIPTION
-  nullable    = false
-}
-
 variable "monitor_private_link_scope" {
   type = map(object({
     resource_id           = optional(string, null)
@@ -169,6 +211,22 @@ variable "retention_in_days" {
   type        = number
   default     = 90
   description = "(Optional) The retention period in days. 0 means unlimited."
+}
+
+variable "retry" {
+  type = object({
+    error_message_regex  = optional(list(string), ["ScopeLocked"])
+    interval_seconds     = optional(number, null)
+    max_interval_seconds = optional(number, null)
+  })
+  default     = null
+  description = <<DESCRIPTION
+  The retry configuration for azapi resources. The following properties can be specified:
+
+  - `error_message_regex` - (Required) A list of regular expressions to match against error messages. If any match, the request will be retried.
+  - `interval_seconds` - (Optional) The base number of seconds to wait between retries. Default is `10`.
+  - `max_interval_seconds` - (Optional) The maximum number of seconds to wait between retries. Default is `180`.
+  DESCRIPTION
 }
 
 variable "role_assignments" {
@@ -211,4 +269,22 @@ variable "tags" {
   type        = map(string)
   default     = null
   description = "(Optional) Tags of the resource."
+}
+
+variable "timeouts" {
+  type = object({
+    create = optional(string, null)
+    delete = optional(string, null)
+    read   = optional(string, null)
+    update = optional(string, null)
+  })
+  default     = null
+  description = <<DESCRIPTION
+  The timeout configuration for azapi resources. The following properties can be specified:
+
+  - `create` - (Optional) The timeout for create operations e.g. `"30m"`, `"1h"`.
+  - `delete` - (Optional) The timeout for delete operations e.g. `"30m"`, `"1h"`.
+  - `read` - (Optional) The timeout for read operations e.g. `"30m"`, `"1h"`.
+  - `update` - (Optional) The timeout for update operations e.g. `"30m"`, `"1h"`.
+  DESCRIPTION
 }
