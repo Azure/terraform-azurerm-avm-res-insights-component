@@ -51,6 +51,7 @@ resource "azapi_resource" "lock" {
 
   depends_on = [
     azapi_resource.diagnostic_settings,
+    azapi_resource.linked_storage_account,
     azapi_resource.role_assignment
   ]
 }

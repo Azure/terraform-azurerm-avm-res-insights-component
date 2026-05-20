@@ -54,7 +54,5 @@ resource "azapi_resource" "linked_storage_account" {
   ignore_casing  = true
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-
-  depends_on = [azapi_resource.lock]
 }
 
