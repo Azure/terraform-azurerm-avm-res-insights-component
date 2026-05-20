@@ -28,11 +28,11 @@ variable "workspace_id" {
 variable "application_type" {
   type        = string
   default     = "web"
-  description = "(Required) The type of the application. Possible values are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'other', 'store'."
+  description = "(Required) The type of the application. Possible values are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'Node.JS', 'other', 'store'."
 
   validation {
-    condition     = contains(["ios", "java", "MobileCenter", "other", "phone", "store", "web"], var.application_type)
-    error_message = "Invalid value for replication type. Valid options are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'other', 'store'."
+    condition     = contains(["ios", "java", "MobileCenter", "Node.JS", "other", "phone", "store", "web"], var.application_type)
+    error_message = "Invalid value for application type. Valid options are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'Node.JS', 'other', 'store'."
   }
 }
 

@@ -75,7 +75,7 @@ The following input variables are optional (have default values):
 
 ### <a name="input_application_type"></a> [application\_type](#input\_application\_type)
 
-Description: (Required) The type of the application. Possible values are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'other', 'store'.
+Description: (Required) The type of the application. Possible values are 'web', 'ios', 'java', 'phone', 'MobileCenter', 'Node.JS', 'other', 'store'.
 
 Type: `string`
 
