@@ -81,8 +81,8 @@ variable "diagnostic_settings" {
   A map of diagnostic settings to create on the Application Insights component. The map key is deliberately arbitrary to avoid issues where map keys maybe unknown at plan time.
 
   - `name` - (Optional) The name of the diagnostic setting. One will be generated if not set, however this will not be unique if you want to create multiple diagnostic setting resources.
-  - `logs` - (Optional) A set of log categories or category groups to send to the destination. If both `logs` and `metrics` are omitted or empty, the module defaults to enabling `allLogs`.
-  - `metrics` - (Optional) A set of metric categories to send to the destination. If both `logs` and `metrics` are omitted or empty, the module defaults to enabling `AllMetrics`.
+  - `logs` - (Optional) A set of log categories or category groups to send to the destination. If both `logs` and `metrics` are omitted or empty, the module defaults to enabling `allLogs`. If `logs` is provided and `metrics` is omitted, metrics remain unset.
+  - `metrics` - (Optional) A set of metric categories to send to the destination. If both `logs` and `metrics` are omitted or empty, the module defaults to enabling `AllMetrics`. If `metrics` is provided and `logs` is omitted, logs remain unset. At this resource scope, the only supported metric category is `AllMetrics`.
   - `log_analytics_destination_type` - (Optional) The destination type for the diagnostic setting. Possible values are `Dedicated` and `AzureDiagnostics`. Defaults to `Dedicated`.
   - `workspace_resource_id` - (Optional) The resource ID of the log analytics workspace to send logs and metrics to.
   - `storage_account_resource_id` - (Optional) The resource ID of the storage account to send logs and metrics to.
@@ -104,6 +104,13 @@ variable "diagnostic_settings" {
       ]
     )
     error_message = "At least one of `workspace_resource_id`, `storage_account_resource_id`, `marketplace_partner_resource_id`, or `event_hub_authorization_rule_resource_id`, must be set."
+  }
+  validation {
+    condition = alltrue([
+      for _, v in var.diagnostic_settings :
+      alltrue([for metric in v.metrics : metric.category == null || metric.category == "AllMetrics"])
+    ])
+    error_message = "metrics[*].category must be `AllMetrics` or null for Application Insights diagnostic settings."
   }
 }
 
