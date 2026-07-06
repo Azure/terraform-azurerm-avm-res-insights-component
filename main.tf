@@ -1,5 +1,3 @@
-
-
 resource "azurerm_application_insights" "this" {
   application_type                      = var.application_type
   location                              = var.location
@@ -55,4 +53,3 @@ resource "azapi_resource" "linked_storage_account" {
   read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 }
-
