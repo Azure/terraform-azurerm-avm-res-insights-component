@@ -29,11 +29,7 @@ resource "azapi_resource" "monitor_private_link_scope" {
       subscriptionLocation = each.value.subscription_location
     }
   }
-  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  ignore_casing  = true
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_casing = true
 }
 
 resource "azapi_resource" "linked_storage_account" {
@@ -47,9 +43,5 @@ resource "azapi_resource" "linked_storage_account" {
       linkedStorageAccount = each.value.resource_id
     }
   }
-  create_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  ignore_casing  = true
-  read_headers   = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  update_headers = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
+  ignore_casing = true
 }

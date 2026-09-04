@@ -31,12 +31,8 @@ resource "azapi_resource" "lock" {
   parent_id              = azurerm_application_insights.this.id
   type                   = module.avm_interfaces.lock_azapi.type
   body                   = module.avm_interfaces.lock_azapi.body
-  create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = []
   retry                  = var.retry
-  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = var.timeouts != null ? { this = var.timeouts } : {}
@@ -64,12 +60,8 @@ resource "azapi_resource" "role_assignment" {
   parent_id              = azurerm_application_insights.this.id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = []
   retry                  = var.retry
-  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = var.timeouts != null ? { this = var.timeouts } : {}
@@ -91,14 +83,10 @@ resource "azapi_resource" "diagnostic_settings" {
   parent_id              = azurerm_application_insights.this.id
   type                   = each.value.type
   body                   = each.value.body
-  create_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
-  delete_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   ignore_casing          = true
   ignore_null_property   = true
-  read_headers           = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
   response_export_values = []
   retry                  = var.retry
-  update_headers         = var.enable_telemetry ? { "User-Agent" : local.avm_azapi_header } : null
 
   dynamic "timeouts" {
     for_each = var.timeouts != null ? { this = var.timeouts } : {}
