@@ -31,7 +31,8 @@ module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.12.0"
 
-  is_recommended = true
+  enable_telemetry = false
+  is_recommended   = true
 }
 
 # This allows us to randomize the region for the resource group.
@@ -75,7 +76,7 @@ module "test" {
   name                = module.naming.application_insights.name_unique
   resource_group_name = azurerm_resource_group.this.name
   workspace_id        = azurerm_log_analytics_workspace.this.id
-  enable_telemetry    = var.enable_telemetry # see variables.tf
+  enable_telemetry    = false # see variables.tf
 }
 ```
 
