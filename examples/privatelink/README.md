@@ -76,7 +76,7 @@ module "test" {
   name                          = module.naming.application_insights.name_unique
   resource_group_name           = azurerm_resource_group.this.name
   workspace_id                  = azurerm_log_analytics_workspace.this.id
-  enable_telemetry              = false # see variables.tf
+  enable_telemetry              = var.enable_telemetry # see variables.tf
   internet_ingestion_enabled    = false
   internet_query_enabled        = false
   local_authentication_disabled = true
@@ -130,7 +130,7 @@ If it is set to false, then no telemetry will be collected.
 
 Type: `bool`
 
-Default: `true`
+Default: `false`
 
 ## Outputs
 
