@@ -1,0 +1,10 @@
+{
+  "$schema": "https://raw.githubusercontent.com/Azure/azure-verified-modules-tools/main/src/Avm.Authoring/Resources/Schemas/v1/avm-module-metadata.schema.json",
+  "moduleDisplayName": "Application Insight",
+  "moduleDescription": "AVM Resource Module for Application Insight",
+  "canonicalType": "Microsoft.Insights/components",
+  "owners": [
+    "Jfolberth"
+  ],
+  "telemetryIdPrefix": "46d3xtrf.res.4439417"
+}
