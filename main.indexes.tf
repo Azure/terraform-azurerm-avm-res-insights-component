@@ -1,8 +1,9 @@
 # AVM Interfaces module for locks, role assignments, and diagnostic settings
 module "avm_interfaces" {
   source  = "Azure/avm-utl-interfaces/azure"
-  version = "0.6.0"
+  version = "0.9.0"
 
+  location                                  = var.location
   diagnostic_settings_v2                    = local.diagnostic_settings_with_names
   enable_telemetry                          = var.enable_telemetry
   lock                                      = var.lock
