@@ -2,6 +2,10 @@ terraform {
   required_version = "~> 1.3"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">=3.71, < 5.0.0"
@@ -38,8 +42,8 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.2"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is required for resource modules
@@ -62,6 +66,9 @@ resource "azurerm_log_analytics_workspace" "this" {
 # with a data source.
 module "test" {
   source = "../.."
+  providers = {
+    azapi = azapi
+  }
 
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...

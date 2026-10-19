@@ -9,6 +9,10 @@ terraform {
   required_version = "~> 1.3"
 
   required_providers {
+    azapi = {
+      source  = "Azure/azapi"
+      version = "~> 2.12"
+    }
     azurerm = {
       source  = "hashicorp/azurerm"
       version = ">=3.71, < 5.0.0"
@@ -45,8 +49,8 @@ resource "random_integer" "region_index" {
 
 # This ensures we have unique CAF compliant names for our resources.
 module "naming" {
-  source  = "Azure/naming/azurerm"
-  version = "0.4.2"
+  source  = "Azure/avm-utl-naming/azure"
+  version = "0.2.0"
 }
 
 # This is required for resource modules
@@ -69,6 +73,9 @@ resource "azurerm_log_analytics_workspace" "this" {
 # with a data source.
 module "test" {
   source = "../.."
+  providers = {
+    azapi = azapi
+  }
 
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
@@ -99,6 +106,8 @@ resource "azurerm_monitor_private_link_scope" "this" {
 The following requirements are needed by this module:
 
 - <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.3)
+
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 - <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>=3.71, < 5.0.0)
 
@@ -142,9 +151,9 @@ The following Modules are called:
 
 ### <a name="module_naming"></a> [naming](#module\_naming)
 
-Source: Azure/naming/azurerm
+Source: Azure/avm-utl-naming/azure
 
-Version: 0.4.2
+Version: 0.2.0
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
