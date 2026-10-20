@@ -1,26 +1,14 @@
 terraform {
-  required_version = "~> 1.3"
+  required_version = ">= 1.9, < 2.0"
 
   required_providers {
     azapi = {
       source  = "Azure/azapi"
       version = "~> 2.12"
     }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">=3.71, < 5.0.0"
-    }
     random = {
       source  = "hashicorp/random"
       version = "~> 3.5"
-    }
-  }
-}
-
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
     }
   }
 }
@@ -30,9 +18,6 @@ provider "azurerm" {
 module "regions" {
   source  = "Azure/avm-utl-regions/azurerm"
   version = "0.13.0"
-  providers = {
-    azapi = azapi
-  }
 
   location         = var.location
   enable_telemetry = var.enable_telemetry
@@ -54,50 +39,71 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
-  name     = module.naming.resource_group.name_unique
+resource "azapi_resource" "resource_group" {
+  location               = module.regions.regions[random_integer.region_index.result].name
+  name                   = module.naming.resource_group.name_unique
+  type                   = "Microsoft.Resources/resourceGroups@2024-03-01"
+  response_export_values = []
 }
 
-#Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "PerGB2018"
+# The Log Analytics workspace that Application Insights sends its data to.
+resource "azapi_resource" "log_analytics_workspace" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.log_analytics_workspace.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.OperationalInsights/workspaces@2025-07-01"
+  body = {
+    properties = {
+      retentionInDays = 30
+      sku = {
+        name = "PerGB2018"
+      }
+    }
+  }
+  response_export_values = []
 }
 
 # This is the storage account for the profiler.
-resource "azurerm_storage_account" "this" {
-  account_replication_type = "ZRS"
-  account_tier             = "Standard"
-  location                 = azurerm_resource_group.this.location
-  name                     = module.naming.storage_account.name_unique
-  resource_group_name      = azurerm_resource_group.this.name
-  min_tls_version          = "TLS1_2"
+resource "azapi_resource" "storage_account" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.storage_account.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Storage/storageAccounts@2024-01-01"
+  body = {
+    kind = "StorageV2"
+    properties = {
+      allowBlobPublicAccess = false
+      allowSharedKeyAccess  = false
+      minimumTlsVersion     = "TLS1_2"
+      networkAcls = {
+        bypass        = "AzureServices"
+        defaultAction = "Allow"
+      }
+      supportsHttpsTrafficOnly = true
+    }
+    sku = {
+      name = "Standard_ZRS"
+    }
+  }
+  response_export_values = []
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../../"
   providers = {
     azapi = azapi
   }
 
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  location                            = azurerm_resource_group.this.location
+  location                            = azapi_resource.resource_group.location
   name                                = module.naming.application_insights.name_unique
-  resource_group_name                 = azurerm_resource_group.this.name
-  workspace_id                        = azurerm_log_analytics_workspace.this.id
+  parent_id                           = azapi_resource.resource_group.id
+  workspace_id                        = azapi_resource.log_analytics_workspace.id
   enable_telemetry                    = var.enable_telemetry # see variables.tf
   force_customer_storage_for_profiler = true
   linked_storage_account = {
     profiler = {
-      resource_id = azurerm_storage_account.this.id
+      resource_id = azapi_resource.storage_account.id
     }
   }
 }

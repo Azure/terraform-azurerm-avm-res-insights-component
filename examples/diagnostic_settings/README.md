@@ -14,16 +14,12 @@ At this resource scope, metrics currently support only `AllMetrics`.
 
 ```hcl
 terraform {
-  required_version = "~> 1.3"
+  required_version = ">= 1.9, < 2.0"
 
   required_providers {
     azapi = {
       source  = "Azure/azapi"
-      version = ">=2.9.0, < 3.0.0"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">=3.71, < 5.0.0"
+      version = "~> 2.12"
     }
     random = {
       source  = "hashicorp/random"
@@ -31,12 +27,6 @@ terraform {
     }
   }
 }
-
-provider "azurerm" {
-  features {}
-}
-
-provider "azapi" {}
 
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
@@ -118,10 +108,10 @@ module "test" {
 
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
-  location            = azapi_resource.resource_group.location
-  name                = module.naming.application_insights.name_unique
-  resource_group_name = azapi_resource.resource_group.name
-  workspace_id        = azapi_resource.log_insights.id
+  location     = azapi_resource.resource_group.location
+  name         = module.naming.application_insights.name_unique
+  parent_id    = azapi_resource.resource_group.id
+  workspace_id = azapi_resource.log_insights.id
   diagnostic_settings = {
     default = {
       name                  = "diag-${module.naming.application_insights.name_unique}"
@@ -193,11 +183,9 @@ module "test" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.3)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
-- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (>=2.9.0, < 3.0.0)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>=3.71, < 5.0.0)
+- <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 

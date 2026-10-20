@@ -6,16 +6,12 @@ This deploys the module with local authentication disabled, public internet inge
 
 ```hcl
 terraform {
-  required_version = "~> 1.3"
+  required_version = ">= 1.9, < 2.0"
 
   required_providers {
     azapi = {
       source  = "Azure/azapi"
       version = "~> 2.12"
-    }
-    azurerm = {
-      source  = "hashicorp/azurerm"
-      version = ">=3.71, < 5.0.0"
     }
     random = {
       source  = "hashicorp/random"
@@ -24,19 +20,15 @@ terraform {
   }
 }
 
-provider "azurerm" {
-  features {
-    resource_group {
-      prevent_deletion_if_contains_resources = false
-    }
-  }
-}
-
 ## Section to provide a random Azure region for the resource group
 # This allows us to randomize the region for the resource group.
 module "regions" {
-  source  = "Azure/regions/azurerm"
-  version = "0.8.2"
+  source  = "Azure/avm-utl-regions/azurerm"
+  version = "0.13.0"
+
+  location         = var.location
+  enable_telemetry = var.enable_telemetry
+  is_recommended   = true
 }
 
 # This allows us to randomize the region for the resource group.
@@ -54,49 +46,66 @@ module "naming" {
 }
 
 # This is required for resource modules
-resource "azurerm_resource_group" "this" {
-  location = module.regions.regions[random_integer.region_index.result].name
-  name     = module.naming.resource_group.name_unique
+resource "azapi_resource" "resource_group" {
+  location               = module.regions.regions[random_integer.region_index.result].name
+  name                   = module.naming.resource_group.name_unique
+  type                   = "Microsoft.Resources/resourceGroups@2024-03-01"
+  response_export_values = []
 }
 
-#Log Analytics Workspace for diagnostic settings. Required for workspace-based diagnostic settings.
-resource "azurerm_log_analytics_workspace" "this" {
-  location            = azurerm_resource_group.this.location
-  name                = module.naming.log_analytics_workspace.name_unique
-  resource_group_name = azurerm_resource_group.this.name
-  sku                 = "PerGB2018"
+# The Log Analytics workspace that Application Insights sends its data to.
+resource "azapi_resource" "log_analytics_workspace" {
+  location  = azapi_resource.resource_group.location
+  name      = module.naming.log_analytics_workspace.name_unique
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.OperationalInsights/workspaces@2025-07-01"
+  body = {
+    properties = {
+      retentionInDays = 30
+      sku = {
+        name = "PerGB2018"
+      }
+    }
+  }
+  response_export_values = []
+}
+
+resource "azapi_resource" "private_link_scope" {
+  location  = "global"
+  name      = "privatelink.scope"
+  parent_id = azapi_resource.resource_group.id
+  type      = "Microsoft.Insights/privateLinkScopes@2021-09-01"
+  body = {
+    properties = {
+      accessModeSettings = {
+        ingestionAccessMode = "Open"
+        queryAccessMode     = "Open"
+      }
+    }
+  }
+  response_export_values = []
 }
 
 # This is the module call
-# Do not specify location here due to the randomization above.
-# Leaving location as `null` will cause the module to use the resource group location
-# with a data source.
 module "test" {
   source = "../.."
   providers = {
     azapi = azapi
   }
 
-  # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
-  # ...
-  location                      = azurerm_resource_group.this.location
+  location                      = azapi_resource.resource_group.location
   name                          = module.naming.application_insights.name_unique
-  resource_group_name           = azurerm_resource_group.this.name
-  workspace_id                  = azurerm_log_analytics_workspace.this.id
+  parent_id                     = azapi_resource.resource_group.id
+  workspace_id                  = azapi_resource.log_analytics_workspace.id
   enable_telemetry              = var.enable_telemetry # see variables.tf
   internet_ingestion_enabled    = false
   internet_query_enabled        = false
   local_authentication_disabled = true
   monitor_private_link_scope = {
     ampls_01 = {
-      resource_id = azurerm_monitor_private_link_scope.this.id
+      resource_id = azapi_resource.private_link_scope.id
     }
   }
-}
-
-resource "azurerm_monitor_private_link_scope" "this" {
-  name                = "privatelink.scope"
-  resource_group_name = azurerm_resource_group.this.name
 }
 ```
 
@@ -105,11 +114,9 @@ resource "azurerm_monitor_private_link_scope" "this" {
 
 The following requirements are needed by this module:
 
-- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (~> 1.3)
+- <a name="requirement_terraform"></a> [terraform](#requirement\_terraform) (>= 1.9, < 2.0)
 
 - <a name="requirement_azapi"></a> [azapi](#requirement\_azapi) (~> 2.12)
-
-- <a name="requirement_azurerm"></a> [azurerm](#requirement\_azurerm) (>=3.71, < 5.0.0)
 
 - <a name="requirement_random"></a> [random](#requirement\_random) (~> 3.5)
 
@@ -117,9 +124,9 @@ The following requirements are needed by this module:
 
 The following resources are used by this module:
 
-- [azurerm_log_analytics_workspace.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/log_analytics_workspace) (resource)
-- [azurerm_monitor_private_link_scope.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_private_link_scope) (resource)
-- [azurerm_resource_group.this](https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/resource_group) (resource)
+- [azapi_resource.log_analytics_workspace](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.private_link_scope](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
+- [azapi_resource.resource_group](https://registry.terraform.io/providers/Azure/azapi/latest/docs/resources/resource) (resource)
 - [random_integer.region_index](https://registry.terraform.io/providers/hashicorp/random/latest/docs/resources/integer) (resource)
 
 <!-- markdownlint-disable MD013 -->
@@ -141,6 +148,14 @@ Type: `bool`
 
 Default: `true`
 
+### <a name="input_location"></a> [location](#input\_location)
+
+Description: The Azure region for this module's resources or telemetry deployment.
+
+Type: `string`
+
+Default: `"eastus"`
+
 ## Outputs
 
 No outputs.
@@ -157,9 +172,9 @@ Version: 0.2.0
 
 ### <a name="module_regions"></a> [regions](#module\_regions)
 
-Source: Azure/regions/azurerm
+Source: Azure/avm-utl-regions/azurerm
 
-Version: 0.8.2
+Version: 0.13.0
 
 ### <a name="module_test"></a> [test](#module\_test)
 
