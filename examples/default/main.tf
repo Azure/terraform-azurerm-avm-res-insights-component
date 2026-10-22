@@ -66,9 +66,6 @@ resource "azapi_resource" "log_analytics_workspace" {
 # This is the module call
 module "test" {
   source = "../../"
-  providers = {
-    azapi = azapi
-  }
 
   location         = azapi_resource.resource_group.location
   name             = module.naming.application_insights.name_unique
