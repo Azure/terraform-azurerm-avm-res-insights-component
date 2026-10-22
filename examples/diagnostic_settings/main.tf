@@ -87,9 +87,6 @@ resource "azapi_resource" "log_diagnostic" {
 # with a data source.
 module "test" {
   source = "../.."
-  providers = {
-    azapi = azapi
-  }
 
   # source             = "Azure/avm-<res/ptn>-<name>/azurerm"
   # ...
